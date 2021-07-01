@@ -1,9 +1,10 @@
+@import '../../media-query';
+
 .Company-card {
   display: flex;
-  flex-wrap: wrap;
 
   width: 88%;
-  max-width: 800px;
+  max-width: 880px;
 
   margin: 24px auto;
   padding: 36px;
@@ -11,20 +12,8 @@
 
   box-shadow: unquote('0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%)');
 
-  &-img-wrapper {
-    background-color: aqua; // 仮
-    height: 100%;
-    // height: 
-  }
-  // &-img {
-  // }
-
-  // &-body {
-    
-  // }
-
   &-title {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
 
     display: block;
@@ -38,6 +27,6 @@
 
   &-desc {
     margin: 0 8px;
+    font-size: 15px;
   }
-
 }

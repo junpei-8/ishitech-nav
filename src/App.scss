@@ -1,25 +1,37 @@
-.Root-header {
-  position: fixed;
-  width: 100%;
+@import './media-query';
 
-  &-nav {
-    display: flex;
-    justify-content: space-between;
-
-    &-anchors {
-      padding: 8px;
-    }
-    &-anchor {
-      font-size: 14px;
-      padding: 8px 16px;
-      box-sizing: border-box;
-    }
-  }
+#root, .App {
+  height: 100%
 }
 
+// .Root-header {
+//   position: fixed;
+//   width: 100%;
+
+//   &-nav {
+//     display: flex;
+//     justify-content: space-between;
+
+//     &-anchors {
+//       padding: 8px;
+//     }
+//     &-anchor {
+//       font-size: 14px;
+//       padding: 8px 16px;
+//       box-sizing: border-box;
+//     }
+//   }
+// }
+
 .Root-main {
+  height: 100%;
+
   &-top {
     background-color: #c0dbff;
-    height: 560px;
+    height: 80%;
+
+    @include pc {
+      height: 560px;
+    }
   }
 }
