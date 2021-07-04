@@ -2,12 +2,11 @@ import React from 'react';
 import './CompanyCard.scss';
 
 export interface Company {
+  id: string;
   name: string;
-  desc: string;
   area: string;
+  job: string;
   basicSalary: number;
-  thumbnail: string;
-  imgPath: string;
   searchToken: {
     keyword: {[key: string]: true},
     job: {[key: string]: true},
@@ -15,17 +14,25 @@ export interface Company {
   }
 }
 
-function CompanyCard({data}: {data: Company}) {
+interface Props {
+  data: Company,
+  onClick: (data: Company) => any;
+}
+function CompanyCard({data, onClick}: Props) {
+  const clickHandler = () => {
+    onClick(data);
+  }
+
   return (
-    <div className="Company-card">
+    <div className="Company-card" onClick={clickHandler}>
       <span className="Company-card-title">{data.name}</span>
 
       <ul className="Company-card-tips-wrapper">
-        <li className="Company-card-tips">・{data.area}</li>
-        <li className="Company-card-tips">・月収 {data.basicSalary}万円</li>
+        <li>地域：　</li>
+        <li>就業形態：　{ data.job }</li>
+        <li>基本給：　{ (data.basicSalary + '').substring(0, 2) }万円</li>
       </ul>
 
-      <p className="Company-card-desc">{data.desc}</p>
     </div>
   );
 }

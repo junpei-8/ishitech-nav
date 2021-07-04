@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './SearchField.scss';
 
 import { useHistory } from 'react-router';
-import { createUrlSearchParams } from '../../common';
+import { createUrlSearchParams, punctuationReplacer, spaceReplacer } from '../../common';
 // import { searchToken, SearchToken } from '../../di/search-token';
 
 // const SEARCH_TOKEN_PARAMS = ['keyword', 'job', 'area'];
@@ -22,10 +22,6 @@ function SearchField() {
       area: ''
     });
 
-  const onChangeInputValue = (event: OnChangeEvent, key: keyof InputtedSearchToken) => {
-    const value = event.target.value;
-    setSearchToken({...inputtedSearchToken, [key]: value });
-  }
 
   const reactHistory = useHistory();
   useEffect(() => {
@@ -33,11 +29,13 @@ function SearchField() {
       ...inputtedSearchToken,
       ...createUrlSearchParams(reactHistory.location.search) as any
     });
-    // setSearchToken(INPUTTED_SEARCH_TOKEN);
-    // console.log('test');
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const onChangeInputValue = (event: OnChangeEvent, key: keyof InputtedSearchToken) => {
+    const value = event.target.value;
+    setSearchToken({...inputtedSearchToken, [key]: value });
+  }
 
   const search = () => {
     const token = inputtedSearchToken;
@@ -47,12 +45,12 @@ function SearchField() {
     (Object.keys(token) as (keyof InputtedSearchToken)[]).forEach((key) => {
       const param = token[key];
       if (param) {
-        query = `${query}&${key}=${param}`;
+        query = `${query}&${key}=${spaceReplacer(punctuationReplacer(param))}`;
       }
     });
 
-    // 先頭の`&`を取り除く + 両端の空白を取り除く + その他の空白を"+"に置換する
-    query = query.slice(1).trim().replaceAll(' ', '+');
+    // 先頭の`&`を取り除く => 記号を半角スペースへ変換 => 両端のスペースを削除し、連続したスペースと全角スペースを半角スペースへ変換する
+    query = query.slice(1).replace(/ /g, '+');
     reactHistory.push('/search?' + query);
   }
 

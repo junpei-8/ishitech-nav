@@ -1,8 +1,8 @@
 @import '../../media-query';
 
 .Company-card {
-  display: flex;
-
+  // display: flex;
+  // flex-direction: column;
   width: 88%;
   max-width: 880px;
 
@@ -13,6 +13,7 @@
   box-shadow: unquote('0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%)');
 
   &-title {
+    display: block;
     font-size: 24px;
     font-weight: 600;
 
@@ -20,13 +21,7 @@
   }
 
   &-tips-wrapper {
-    list-style: none;
     padding-left: 0;
     margin: 8px 0;
-  }
-
-  &-desc {
-    margin: 0 8px;
-    font-size: 15px;
   }
 }
