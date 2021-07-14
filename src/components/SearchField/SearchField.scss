@@ -1,23 +1,28 @@
 @import '../../media-query';
 
 .Search-field {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
+  width: 100%;
+  height: 100%;
   background-image: url('https://storage.googleapis.com/ishitech-nav.appspot.com/assets/search-field-background.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 100% center;
 
-  height: 100%;
-  width: fit-content;
-  margin: 0 auto;
-  padding: 0 8px;
+  padding: 0 16px;
   box-sizing: border-box;
 
-  @include pc {
-    width: 100%;
+  &-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  
+    height: 100%;
+    width: fit-content;
+    margin: 0 auto;
+  
+    @include pc {
+      width: 100%;
+    }
   }
 
   &-title {
@@ -33,7 +38,7 @@
     }
   }
 
-  &-input-field {
+  &-form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,7 +80,8 @@
     width: 100%;
     height: 48px;
 
-    background: rgb(103, 169, 255);
+    background-color: rgb(103, 169, 255);
+    color: white;
 
     @include pc {
       min-width: 48px;

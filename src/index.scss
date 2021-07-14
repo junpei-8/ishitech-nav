@@ -5,26 +5,39 @@ html {
 body {
   margin: 0;
   height: 100%;
+  color: rgba(0,0,0,.87);
   background-color: #fafafa;
+  overflow-y: scroll;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+svg {
+  fill: currentColor;
 }
 
 button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   font: inherit;
+  color: inherit;
+  background-color: transparent;
+  margin: 0;
   border: 0;
   outline: 0;
   box-sizing: border-box;
   user-select: none;
   cursor: pointer;
-  outline: none;
-  border: none;
   -webkit-tap-highlight-color: transparent;
-  display: inline-block;
   white-space: nowrap;
   text-decoration: none;
   vertical-align: baseline;
-  text-align: center;
-  margin: 0;
   overflow: visible;
+}
+
+.inner-anchor {
+  height: 100%;
+  width: 100%;
 }
 
 input, textarea {

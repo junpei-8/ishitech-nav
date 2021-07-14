@@ -1,27 +1,56 @@
 @import '../../media-query';
 
 .Company-card {
-  // display: flex;
-  // flex-direction: column;
-  width: 88%;
-  max-width: 880px;
+  width: 100%;
+  max-width: 480px;
 
-  margin: 24px auto;
-  padding: 36px;
+  margin: 16px 0px;
+  padding: 16px;
+  border-top: 4px solid rgb(103, 169, 255);
   box-sizing: border-box;
+
+  @include pc {
+    margin: 24px 8px;
+    padding: 24px;
+  }
 
   box-shadow: unquote('0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%)');
 
   &-title {
     display: block;
     font-size: 24px;
-    font-weight: 600;
-
+    font-weight: bold;
+  }
+  &-id {
     display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: rgba(0,0,0,.64);
   }
 
   &-tips-wrapper {
-    padding-left: 0;
-    margin: 8px 0;
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+  }
+  
+  &-tips {
+    display: flex;
+    align-items: center;
+    margin: 12px 4px;
+  
+    &:last-child {
+      margin-bottom: 0;
+    }
+  
+    &-icon {
+      display: flex;
+      margin-right: 8px;
+    }
+  
+    &-text {
+      display: inline;
+      font-size: 16px;
+    }
   }
 }

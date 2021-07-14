@@ -7,7 +7,6 @@ const HomePage = lazy(() => import('./pages/Home/Home'));
 const SearchPage = lazy(() => import('./pages/Search/Search'));
 
 function App() {
-
   return (
     <div className="App">
       <Router>
@@ -20,13 +19,15 @@ function App() {
           <Suspense fallback={null}>
             <Switch>
               <Route exact path="/" component={HomePage}></Route>
-              <Route path="/search" component={SearchPage}></Route>
+              <Route path="/search/:id" component={SearchPage}></Route>
             </Switch>
           </Suspense>
         </main>
       </Router>
 
-      <footer className="Root-footer"></footer>
+      <footer className="Root-footer">
+        
+      </footer>
     </div>
   );
 }

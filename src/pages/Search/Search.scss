@@ -1,8 +1,111 @@
+@import '../../media-query';
+
 .Search {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: stretch;
+
+  padding: 24px 16px;
+  @include pc {
+    padding: 24px;
+  }
+
+  &-shadow-card {
+    opacity: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
   &-pdf-previewer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
     top: 0; left: 0;
     height: 100%; width: 100%;
-    background-color: rgba(0,0,0,.4);
+    background-color: rgba(0,0,0,.6);
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 8px 4px 0;
+      box-sizing: border-box;
+      background: linear-gradient(to bottom,rgba(0,0,0,0.65) 0%,transparent 100%);
+
+      &-button-container {
+        display: flex;
+      }
+
+      &-button {
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin: 0 4px;
+
+        &:hover {
+          background-color: rgba(255,255,255,.16);
+        }
+      }
+    }
+
+    &-footer {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 8px;
+      background: linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 100%);
+
+      &-button {
+        height: 40px;
+        width: 40px;
+        color: white;
+
+        &:hover {
+          background-color: rgba(255,255,255,.16);
+        }
+      }
+
+      &-divider {
+        background-color: white;
+        height: 80%;
+        width: 2px;
+        border-radius: 2px;
+      }
+    }
+  }
+
+  &-pdf-preview {
+    width: 100%;
+    flex: 1;
+
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &-page {
+      height: 100%;
+      display: flex;
+    }
+
+    canvas {
+      width: auto !important;
+      margin: auto;
+  
+      padding: 0 8px;
+      @include pc {
+        padding: 0 16px;
+      }
+    }
   }
 }
