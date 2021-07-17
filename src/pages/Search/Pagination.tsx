@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { DB_LIMIT } from '../../environment';
-import './SearchPagination.scss';
 
 function createMaxPage(dataSize: number): number {
   const limit = DB_LIMIT;
@@ -14,7 +13,7 @@ interface Props {
   page: number;
   dataSize: number;
 }
-const SearchPagination = React.memo(({ page, dataSize }: Props) => {
+const Pagination = React.memo(({ page, dataSize }: Props) => {
   const [buttons, setButtons] = useState<Buttons>([] as any);
 
   useEffect(() => {
@@ -72,4 +71,4 @@ const SearchPagination = React.memo(({ page, dataSize }: Props) => {
   );
 });
 
-export default SearchPagination;
+export default Pagination;

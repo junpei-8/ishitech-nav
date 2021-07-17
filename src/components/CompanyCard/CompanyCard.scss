@@ -5,13 +5,13 @@
   max-width: 480px;
 
   margin: 16px 0px;
-  padding: 16px;
+  padding: 16px 16px 20px;
   border-top: 4px solid rgb(103, 169, 255);
   box-sizing: border-box;
 
   @include pc {
     margin: 24px 8px;
-    padding: 24px;
+    padding: 16px 24px 20px;
   }
 
   box-shadow: unquote('0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%)');

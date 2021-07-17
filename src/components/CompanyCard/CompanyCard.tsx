@@ -12,7 +12,6 @@ export interface Company {
     job: {[key: string]: true},
     area: {[key: string]: true},
   },
-  blob?: string;
 }
 
 interface Props {
@@ -21,6 +20,8 @@ interface Props {
 }
 
 const CompanyCard = React.memo(({ data, onClick }: Props) => {
+  console.log('render card');
+
   return (
     <div className="Company-card" onClick={() => onClick(data)}>
       <div className="Company-card-header">

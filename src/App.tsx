@@ -1,9 +1,9 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import './App.scss';
 import SearchField from './components/SearchField';
 
-const HomePage = lazy(() => import('./pages/Home/Home'));
+// const HomePage = lazy(() => import('./pages/Home/Home'));
 const SearchPage = lazy(() => import('./pages/Search/Search'));
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
 
           <Suspense fallback={null}>
             <Switch>
-              <Route exact path="/" component={HomePage}></Route>
+              <Redirect exact path="/" to="/search/1" ></Redirect>
               <Route path="/search/:id" component={SearchPage}></Route>
             </Switch>
           </Suspense>
