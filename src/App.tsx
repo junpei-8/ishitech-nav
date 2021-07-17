@@ -19,7 +19,7 @@ function App() {
           <Suspense fallback={null}>
             <Switch>
               <Redirect exact path="/" to="/search/1" ></Redirect>
-              <Route path="/search/:id" component={SearchPage}></Route>
+              <Route path="/search" component={SearchPage}></Route>
             </Switch>
           </Suspense>
         </main>
