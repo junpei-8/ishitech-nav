@@ -6,7 +6,6 @@ function FakeSession({ children }: PropsWithChildren<any>) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    window.localStorage.clear();
     setHasLoggedIn(!!window.localStorage.getItem('hasLoggedIn'))
   }, [])
 
