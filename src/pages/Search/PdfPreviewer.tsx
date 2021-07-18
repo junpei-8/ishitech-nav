@@ -53,8 +53,9 @@ const PdfPreviewer = React.memo(({ company, closeEvent }: Props) => {
         const styleRef = canvas.style;
         const currHeight = parseFloat(styleRef.height);
         
-        if (currHeight) { // height 0% は省く
-          styleRef.height = currHeight + value + '%';
+        const height = currHeight + value;
+        if (height > 19) { // 20%まで縮小可
+          styleRef.height = height + '%';
         }
 
       } else {

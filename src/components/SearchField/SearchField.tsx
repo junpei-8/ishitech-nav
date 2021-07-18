@@ -58,7 +58,7 @@ function SearchField() {
 
     // 先頭の "&" を削除し半角スペースを "+" へ変換
     query = query.slice(1).replace(/ /g, '+');
-    history.push('/search/1?' + query);
+    history.push('/search/?' + query);
   }
 
   return (

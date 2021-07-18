@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import './Search.scss';
 import { useHistory } from 'react-router-dom';
 import { Company } from '../../components/CompanyCard/CompanyCard';
@@ -12,7 +12,6 @@ import { ngramWithReplacer } from '../../common/ngram';
 import { DB_LIMIT, YEAR } from '../../environment';
 
 import { ReactHistory } from '../../global';
-import Pagination from './Pagination';
 import PdfPreviewer from './PdfPreviewer';
 
 type Query = firebase.firestore.Query<firebase.firestore.DocumentData>;
@@ -32,23 +31,6 @@ function getCompanyDataQuery(params: URLSearchParams): Query {
   return query;
 }
 
-function createCompanies(snapshot: QuerySnapshot): Company[] {
-  const companies: Company[] = [];
-  snapshot.forEach(result => companies.push(result.data() as any))
-  return companies;
-}
-
-function createStartAtIndex(page: number, dataSize: number): number {
-  const limit = DB_LIMIT;
-  const selectedSize = (page - 1) * limit;
-  const size = dataSize - 1;
-
-  return selectedSize > size
-    ? (size - size % limit)
-    : selectedSize;
-}
-
-
 interface DatabaseRef {
   query: Query;
   snapshot?: QuerySnapshot;
@@ -56,18 +38,127 @@ interface DatabaseRef {
 
 let previousLocation: ReactHistory['location'] = {} as any;
 function Search() {
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const reRender = useReducer(() => ({}), {})[1] as () => void
+
+  const [companyCards, _setCompanyCards] = useState<(JSX.Element[]) | null>([]);
+  const addCompanies = (snapshot: QuerySnapshot | null, reset?: boolean) => {
+    if (snapshot) {
+      databaseRef.current.snapshot = snapshot;
+      if (snapshot.empty) {
+        hasFetchedLastCompany.current = true;
+        reRender();
+        return;
+      }
+
+      const Card = CompanyCard;
+      const newCards: JSX.Element[] = [];
+
+      // ループ回数を1回減らすため -1 している
+      const docs = snapshot.docs;
+      const docsLen = docs.length - 1;
+
+      let i = 0;
+      while(i < docsLen) {
+        const data = docs[i].data() as Company;
+        newCards.push(<Card onClick={displayPdf} data={data} key={data.id}></Card>);
+        i++;
+      }
+  
+      const lastData = docs[i].data() as Company;
+
+      // ex) (15 + 1) < 16
+      if (i + 1 < DB_LIMIT) {
+        hasFetchedLastCompany.current = true;
+        newCards.push(<Card onClick={displayPdf} data={lastData} key={lastData.id}></Card>)
+
+      } else {
+        newCards.push(<Card onClick={displayPdf} data={lastData} key={lastData.id} ref={observedCompanyCardRef} />)
+      }
+
+      reset
+        ? _setCompanyCards(newCards)
+        : _setCompanyCards((cards) => (cards || []).concat(newCards));
+
+    } else {
+      _setCompanyCards(null) // Not-matched ページを表示
+    }
+  }
+
   const [selectedCompany, _setSelectedCompany]  = useState<Company | null>(null);
-  const [paginationProps, setPaginationProps] = useState<React.ComponentProps<typeof Pagination>>({} as any);
+  const setSelectedCompany = (value: Company | null) => {
+    _setSelectedCompany(value);
+    selectedCompanyRef.current = value;
+  }
+
+  const [hasFetchedCompanies, setHasFetchedCompanies] = useState<boolean>(false);
+  const hasFetchedLastCompany = useRef<boolean>(false);
+  // const [hasFetchedLastCompany, setHasFetchedLastCompany] = useState<boolean>(false);
   
   const selectedCompanyRef = useRef<Company | null>(null);
   const databaseRef = useRef<DatabaseRef>({} as any);
 
-  const history = useHistory();
+  const observedCompanyCardRef = useRef<HTMLDivElement>(null);
+  const companyCardIntersectionObserverRef = useRef<IntersectionObserver | null>(null);
 
+  const history = useHistory();
   // onMounted
   useEffect(() => {
+    // observer代入処理
+    const IntersectionObs = IntersectionObserver;
+    if (IntersectionObs) {
+      companyCardIntersectionObserverRef.current =
+        new IntersectionObs((entries, observer) => {
+          const event = entries[0];
+          if (event.isIntersecting) {
+            observer.disconnect();
+            addNextCompanies();
+          }
+        });
+    }
+
     previousLocation = {} as any;
+    const onChangeHistory = () => {
+      const prevLocation: ReactHistory['location'] = previousLocation;
+      const currLocation = previousLocation = history.location;
+    
+      if (currLocation.search !== prevLocation.search) {
+        window.scrollTo({ top: 0 }); // setCompanies([]);
+        hasFetchedLastCompany.current = false;
+        setHasFetchedCompanies(false);
+
+        const dbLimit = DB_LIMIT;
+  
+        const query = databaseRef.current.query = 
+          getCompanyDataQuery(new URLSearchParams(currLocation.search));
+        
+        query.limit(dbLimit).get()
+          .then(snapshot => {
+            setHasFetchedCompanies(true);
+            snapshot.empty
+              ? addCompanies(null, true)
+              : addCompanies(snapshot, true);
+          })
+      }
+  
+      if (currLocation.hash !== prevLocation.hash) {
+        const hash = currLocation.hash.slice(1);
+        if (hash) {
+          if (!selectedCompanyRef.current) {
+            firestore.collection(`companies-${YEAR}`).doc(hash).get()
+              .then(snapshot => {
+                const data = snapshot.data() as Company;
+                data
+                  ? setSelectedCompany(data)
+                  : removeHash();
+              })
+          }
+    
+        } else {
+          setSelectedCompany(null);
+        }
+      }
+    }
+
     onChangeHistory();
     const unsubscribe = history.listen(onChangeHistory);
 
@@ -79,76 +170,26 @@ function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const setSelectedCompany = (value: Company | null) => {
-    _setSelectedCompany(value);
-    selectedCompanyRef.current = value;
-  }
+  useEffect(() => {
+    const obsRef = companyCardIntersectionObserverRef.current;
+    const cardRef = observedCompanyCardRef.current;
+    if (obsRef && cardRef && !hasFetchedLastCompany.current) {
+      obsRef.observe(cardRef);
+    }
+  }, [companyCards]);
 
-  const onChangeHistory = () => {
-    const prevLocation: ReactHistory['location'] = previousLocation;
-    const currLocation = previousLocation = history.location;
-
+  const addNextCompanies = () => {
     const dbRef = databaseRef.current;
     const dbLimit = DB_LIMIT;
+    const prevSnapshot = dbRef.snapshot;
 
-    if (currLocation.search !== prevLocation.search) {
-      window.scrollTo({ top: 0 });
-      const page = parseFloat(currLocation.pathname.split('/')[2]);
-      const query = dbRef.query =
-        getCompanyDataQuery(new URLSearchParams(currLocation.search));
-
-      query.get()
+    if (prevSnapshot && !hasFetchedLastCompany.current) {
+      setHasFetchedCompanies(false);
+      dbRef.query.startAfter(prevSnapshot.docs[dbLimit - 1]).limit(dbLimit).get()
         .then(snapshot => {
-          dbRef.snapshot = snapshot;
-
-          console.log(snapshot.docs.length)
-
-          const dataSize = snapshot.size;
-          setPaginationProps({page, dataSize});
-
-          if (dataSize) {
-            const startAtIndex = createStartAtIndex(page, snapshot.size);
-            query.startAt(snapshot.docs[startAtIndex]).limit(dbLimit).get()
-              .then(res => setCompanies(createCompanies(res)))
-
-          } else {
-            setCompanies([]);
-          }
-        })
-      
-      // ID(page数)のみの変更（つまりQueryは作成済み）
-    } else if (currLocation.pathname !== prevLocation.pathname) {
-      window.scrollTo({ top: 0 });
-      const snapshot = dbRef.snapshot;
-      if (snapshot) {
-        const dataSize = snapshot.size;
-        if (!dataSize) { return; }
-
-        const page = parseFloat(currLocation.pathname.split('/')[2]);      
-        setPaginationProps({ page, dataSize });
-
-        const startAtIndex = createStartAtIndex(page, snapshot.size);
-        dbRef.query.startAt(snapshot.docs[startAtIndex]).limit(dbLimit).get()
-          .then(res => setCompanies(createCompanies(res)));
-      }
-    }
-
-    if (currLocation.hash !== prevLocation.hash) {
-      const hash = currLocation.hash.slice(1);
-      if (hash) {
-        if (!selectedCompanyRef.current) {
-          firestore.collection(`companies-${YEAR}`).doc(hash).get()
-            .then(result => {
-              const data = result.data() as Company;
-              data
-                ? setSelectedCompany(data)
-                : removeHash();
-            })
-        }
-  
-      } else {
-        setSelectedCompany(null);
-      }
+          setHasFetchedCompanies(true);
+          addCompanies(snapshot);
+        });
     }
   }
 
@@ -162,21 +203,41 @@ function Search() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-    // dataを search-pdf-previewer に表示させる
-    const displayPdf = useCallback((data: Company) => {
-      setSelectedCompany(data);
-      const location = history.location;
-      history.push(location.pathname + location.search + '#' + data.id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  // dataを search-pdf-previewer に表示させる
+  const displayPdf = useCallback((data: Company) => {
+    setSelectedCompany(data);
+    const location = history.location;
+    history.push(location.pathname + location.search + '#' + data.id)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="Search">
-      { companies.map(data => <CompanyCard onClick={displayPdf} data={data} key={data.id}></CompanyCard>) }
+      {
+        companyCards
+          ? companyCards
+          : <div className="Search-not-matched">
+              <h2 className="Search-not-matched-heading">(´・ω・`)</h2>
+              <span className="Search-not-matched-comment">検索結果が見つかりませんでした</span>
+            </div>
+      }
       <div className="Company-card Search-shadow-card"></div>
       <div className="Company-card Search-shadow-card"></div>
 
-      <Pagination {...paginationProps} />
+      <div className="Search-footer">
+        {
+          hasFetchedLastCompany.current
+            ? null
+            : hasFetchedCompanies
+              ? companyCardIntersectionObserverRef.current
+                ? null
+                : <button className="Search-footer-button" onClick={addNextCompanies}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="56px" viewBox="0 0 24 24" width="56px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                  </button>
+              : <div className="Search-footer-progress-spinner"></div>
+        }
+      </div>
+
       <PdfPreviewer company={selectedCompany} closeEvent={removeHash} />
     </div>
   );

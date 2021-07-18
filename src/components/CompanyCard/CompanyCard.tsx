@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef, memo } from 'react';
 import './CompanyCard.scss';
 
 export interface Company {
@@ -17,13 +17,14 @@ export interface Company {
 interface Props {
   data: Company,
   onClick: (data: Company) => any;
+  ref: any;
 }
 
-const CompanyCard = React.memo(({ data, onClick }: Props) => {
-  console.log('render card');
+type Ref = React.ForwardedRef<HTMLDivElement>;
 
+const CompanyCard = memo(forwardRef(({ data, onClick }: Props, ref: Ref) => {
   return (
-    <div className="Company-card" onClick={() => onClick(data)}>
+    <div className="Company-card" onClick={() => onClick(data)} ref={ref} >
       <div className="Company-card-header">
         <span className="Company-card-title">{ data.name }</span>
         <span className="Company-card-id">{ data.id }</span>
@@ -51,6 +52,6 @@ const CompanyCard = React.memo(({ data, onClick }: Props) => {
       </ul>
     </div>
   );
-})
+}));
 
 export default CompanyCard;
