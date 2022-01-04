@@ -2,8 +2,7 @@
 
 .Company-card {
   width: 100%;
-  // max-width: 480px;
-  max-width: 560px;
+  max-width: 600px;
 
   margin: 16px 0px;
   padding: 16px 16px 20px;
@@ -11,7 +10,7 @@
   box-sizing: border-box;
 
   @include pc {
-    margin: 24px 8px;
+    margin: 24px 16px;
     padding: 16px 24px 20px;
   }
 

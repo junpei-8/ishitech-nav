@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { MlButton } from '@material-lite/react';
 
 function FakeSession({ children }: PropsWithChildren<any>) {
   const [hasLoggedIn, setHasLoggedIn] = useState<boolean>();
@@ -40,8 +41,10 @@ function FakeSession({ children }: PropsWithChildren<any>) {
                   : null
               }
             </div>
-
-            <button className="Fake-session-button" type="submit">決定</button>
+            
+            <MlButton variant="flat">
+              <button className="Fake-session-button" type="submit">決定</button>
+            </MlButton>
           </form>
         </div>
   );

@@ -13,6 +13,7 @@ import { DB_LIMIT, YEAR } from '../../environment';
 
 import { ReactHistory } from '../../global';
 import PdfPreviewer from './PdfPreviewer';
+import { MlButton } from '@material-lite/react';
 
 type Query = firebase.firestore.Query<firebase.firestore.DocumentData>;
 type QuerySnapshot =  firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>;
@@ -38,7 +39,7 @@ interface DatabaseRef {
 
 let previousLocation: ReactHistory['location'] = {} as any;
 function Search() {
-  const reRender = useReducer(() => ({}), {})[1] as () => void
+  const reRender = useReducer(() => ({}), {})[1] as () => void;
 
   const [companyCards, _setCompanyCards] = useState<(JSX.Element[]) | null>([]);
   const addCompanies = (snapshot: QuerySnapshot | null, reset?: boolean) => {
@@ -231,9 +232,11 @@ function Search() {
             : hasFetchedCompanies
               ? companyCardIntersectionObserverRef.current
                 ? null
-                : <button className="Search-footer-button" onClick={addNextCompanies}>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="56px" viewBox="0 0 24 24" width="56px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-                  </button>
+                : <MlButton>
+                    <button className="Search-footer-button" onClick={addNextCompanies}>
+                      <svg xmlns="http://www.w3.org/2000/svg" height="56px" viewBox="0 0 24 24" width="56px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </button>
+                  </MlButton>
               : <div className="Search-footer-progress-spinner"></div>
         }
       </div>

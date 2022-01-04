@@ -1,0 +1,9 @@
+@forward '@material-lite/theming';
+@use '@material-lite/theming' as *;
+
+$material-lite: (
+  default: define-light-theme(),
+  config: (
+    include: (button)
+  )
+);
